@@ -252,7 +252,7 @@ public class diff_match_patchTest : DiffMatchPatcher {
     }
 
     private void diff_cleanupSemanticLosslessTest() {
-        // Slide diffs to match logical boundaries.
+        // Slide ListDiff to match logical boundaries.
         List<Diff> diffs = new List<Diff>();
         this.Diff_cleanupSemanticLossless(diffs);
         assertEquals("diff_cleanupSemanticLossless: Null case.", new List<Diff>(), diffs);
