@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 
-namespace Brimborium.CreateProject.Test.TestUtility;
+namespace Brimborium.CreateProject.Tests.TestUtility;
 
 /// <summary>
 /// Authentication scheme options for the test authentication handler.

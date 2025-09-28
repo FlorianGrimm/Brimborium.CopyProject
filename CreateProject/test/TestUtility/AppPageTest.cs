@@ -1,4 +1,4 @@
-﻿namespace Brimborium.CreateProject.Test.TestUtility;
+﻿namespace Brimborium.CreateProject.Tests.TestUtility;
 
 public class AppPageTest : PageTest {
     [ClassDataSource<WebApplicationFactoryIntegration>(Shared = SharedType.PerTestSession)]

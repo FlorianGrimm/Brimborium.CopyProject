@@ -1,4 +1,4 @@
-﻿namespace Brimborium.CreateProject.Test.TestUtility;
+﻿namespace Brimborium.CreateProject.Tests.TestUtility;
 
 public class TestsIntegration {
     [ClassDataSource<WebApplicationFactoryIntegration>(Shared = SharedType.PerTestSession)]

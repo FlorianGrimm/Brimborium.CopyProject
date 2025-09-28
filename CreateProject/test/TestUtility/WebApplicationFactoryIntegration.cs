@@ -1,6 +1,6 @@
 ﻿using Brimborium.Tracerit.Logger;
 
-namespace Brimborium.CreateProject.Test.TestUtility;
+namespace Brimborium.CreateProject.Tests.TestUtility;
 
 public class WebApplicationFactoryIntegration : IAsyncInitializer {
     private WebApplication? _Application;
