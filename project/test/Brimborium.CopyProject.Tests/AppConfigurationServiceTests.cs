@@ -63,6 +63,35 @@ public class AppConfigurationServiceTests {
         await Assert.That(acs2.GetSettingsFile()).IsEqualTo(sampleSettingsFile);
     }
 
+    [Test]
+    public async Task SaveLoadSettingsFileTest() {
+        var sampleFolder = GetRootFolder("sample");
+        var sampleSettingsFile = System.IO.Path.Combine(GetRootFolder("sample"), "settings", "settings.json");
+
+        System.IO.File.WriteAllText(sampleSettingsFile, "{}");
+
+        var acs = new AppConfigurationService(
+            Options.Create<AppConfiguration>(new AppConfiguration() {
+                RootFolder = sampleFolder,
+                SettingsFolder = "settings",
+                SettingsFile = "settings.json"
+            }));
+        CopyProjectSettings copyProjectSettings =
+            new() {
+                ExcludeFolderNames = ["bin", "obj", "node_modules"],
+                Projects = [
+                    new () {
+                        SourcePath = "settings/project1src",
+                        TargetPath = "settings/project1dst"
+                    }
+                ]
+            };
+        acs.SaveCopyProjectSettings(copyProjectSettings);
+
+        var listCopyProjectSettingsActual = acs.LoadCopyProjectSettings();
+        await Assert.That(listCopyProjectSettingsActual).IsEquivalentTo(copyProjectSettings);
+    }
+
     private static string GetRootFolder(string name, [CallerFilePath] string path = "") {
         for (int i = 0; i < 3; i++) {
             var directory = System.IO.Path.GetDirectoryName(path);

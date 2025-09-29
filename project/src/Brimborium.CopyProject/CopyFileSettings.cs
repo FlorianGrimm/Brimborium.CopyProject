@@ -1,10 +1,23 @@
 namespace Brimborium.CopyProject;
 
-public class CopyFileSettings {
+public sealed class CopyFileSettings {
     private string? _Action;
     private CopyFileSettingsAction _CopyFileSettingsAction;
 
+    public CopyFileSettings() {
+    }
+
+    public CopyFileSettings(
+        string path,
+        string? action = null,
+        string? targetPath = null) {
+        this.Path = path;
+        this.Action = action;
+        this.TargetPath = targetPath;
+    }
+
     public string? Path { get; set; }
+
     public string? Action {
         get => this._Action;
         set {
@@ -22,7 +35,7 @@ public class CopyFileSettings {
     public string? TargetPath { get; set; }
 
     [System.Text.Json.Serialization.JsonIgnore]
-    public CopyFileSettingsAction CopyFileSettingsAction {
+    public CopyFileSettingsAction ActionE {
         get => this._CopyFileSettingsAction;
         set {
             this._CopyFileSettingsAction = value;
@@ -36,13 +49,4 @@ public class CopyFileSettings {
             };
         }
     }
-}
-
-public enum CopyFileSettingsAction {
-    Default,
-    Copy,
-    Delete,
-    Ignore,
-    Diff,
-    Invalid
 }

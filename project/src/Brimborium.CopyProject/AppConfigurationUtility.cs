@@ -9,7 +9,7 @@ public static partial class AppConfigurationUtility {
     }
 
     public static string GetRootFolderFromMarkerFile(
-        string rootMarkerFile, 
+        string rootMarkerFile,
         string? rootFolderRelative) {
         string folder;
         {
@@ -30,7 +30,7 @@ public static partial class AppConfigurationUtility {
                         throw new InvalidOperationException($"RootFolder '{folder}' does not exist.");
                     }
                     return folder;
-                } else { 
+                } else {
                     return folder;
                 }
             } else {
@@ -44,5 +44,27 @@ public static partial class AppConfigurationUtility {
             }
         }
         throw new InvalidOperationException($"RootMarkerFile '{rootMarkerFile}' not found.");
+    }
+
+    public static (string relativePath, bool changed) GetRelativePath(
+        string rootFolder,
+        string path) {
+        if (System.IO.Path.IsPathRooted(path)) {
+            var fullPath = System.IO.Path.GetFullPath(path);
+            var fullRootFolder = System.IO.Path.GetFullPath(rootFolder);
+            var relativePath = System.IO.Path.GetRelativePath(fullRootFolder, fullPath);
+            return (relativePath, true);
+        } else {
+            return (path, true);
+        }
+    }
+
+    public static string EnsureJsonExtension(string settingsName) {
+        var extension = System.IO.Path.GetExtension(settingsName);
+        if (string.Equals(extension, ".json", StringComparison.OrdinalIgnoreCase)) {
+            return settingsName;
+        } else {
+            return $"{settingsName}.json";
+        }
     }
 }

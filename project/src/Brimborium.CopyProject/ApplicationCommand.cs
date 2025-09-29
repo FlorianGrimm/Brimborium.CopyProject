@@ -6,7 +6,6 @@ public enum ApplicationCommand {
     Copy,
     Update,
     Diff,
-    Patch,
     ShowConfig,
     Help,
 }

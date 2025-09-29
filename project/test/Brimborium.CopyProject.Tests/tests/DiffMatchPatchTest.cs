@@ -1,5 +1,5 @@
 ﻿/*
- * Diff Match and Patch -- Test Harness
+ * ShowDiff Match and Patch -- Test Harness
  * Copyright 2018 The diff-match-patch Authors.
  * https://github.com/google/diff-match-patch
  *
@@ -138,7 +138,7 @@ public class diff_match_patchTest : DiffMatchPatcher {
     }
 
     private void diff_charsToLinesTest() {
-        // First check that Diff equality works.
+        // First check that ShowDiff equality works.
         assertTrue("diff_charsToLines: Equality #1.", new Diff(Operation.EQUAL, "a").Equals(new Diff(Operation.EQUAL, "a")));
 
         assertEquals("diff_charsToLines: Equality #2.", new Diff(Operation.EQUAL, "a"), new Diff(Operation.EQUAL, "a"));

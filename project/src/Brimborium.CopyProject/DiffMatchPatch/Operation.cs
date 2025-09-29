@@ -1,5 +1,5 @@
 ﻿/*
- * Diff Match and Patch
+ * ShowDiff Match and Patch
  * Copyright 2018 The diff-match-patch Authors.
  * https://github.com/google/diff-match-patch
  *
@@ -22,9 +22,9 @@
 namespace Brimborium.CopyProject.DiffMatchPatch;
 
 /**-
- * The data structure representing a diff is a List of Diff objects:
- * {Diff(Operation.DELETE, "Hello"), Diff(Operation.INSERT, "Goodbye"),
- *  Diff(Operation.EQUAL, " world.")}
+ * The data structure representing a diff is a List of ShowDiff objects:
+ * {ShowDiff(Operation.DELETE, "Hello"), ShowDiff(Operation.INSERT, "Goodbye"),
+ *  ShowDiff(Operation.EQUAL, " world.")}
  * which means: delete "Hello", add "Goodbye" and keep " world."
  */
 public enum Operation {

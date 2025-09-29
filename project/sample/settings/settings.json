@@ -1,3 +1,13 @@
 {
-
+  "ExcludeFolderNames": [
+    "bin",
+    "obj"
+  ],
+  "Projects": [
+    {
+      "SourcePath": "src",
+      "TargetPath": "dst",
+      "DiffPath": null
+    }
+  ]
 }

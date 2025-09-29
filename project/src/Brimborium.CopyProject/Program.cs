@@ -10,29 +10,34 @@ public class Program {
         => await new Program().RunAsync(args);
 
     public async Task<int> RunAsync(string[] args) {
-        // parse args
-        var (command, remainingArgs) = this.SplitAction(args);
+        try {
+            // parse args
+            var (command, remainingArgs) = this.SplitAction(args);
 
-        // create configuration
-        var configuration = this.CreateConfigurationBuilder(remainingArgs, new ConfigurationBuilder()).Build();
-        
-        // create service provider
-        var serviceBuilder = new ServiceCollection();
-        this.ConfigureServiceBuilder(configuration, serviceBuilder);
-        serviceBuilder.AddLogging((loggingBuilder) => this.ConfigureLogging(configuration, serviceBuilder, loggingBuilder));
-        var serviceProvider = serviceBuilder.BuildServiceProvider();
+            // create configuration
+            var configuration = this.CreateConfigurationBuilder(remainingArgs, new ConfigurationBuilder()).Build();
 
-        // create executor
-        Executor executor = command switch {
-            ApplicationCommand.Help => serviceProvider.GetRequiredService<ExecutorHelp>(),
-            ApplicationCommand.ScanFolder => serviceProvider.GetRequiredService<ExecutorScanFolder>(),
-            ApplicationCommand.Copy => serviceProvider.GetRequiredService<ExecutorCopy>(),
-            ApplicationCommand.Update => serviceProvider.GetRequiredService<ExecutorUpdate>(),
-            ApplicationCommand.Diff => serviceProvider.GetRequiredService<ExecutorDiff>(),
-            _ => serviceProvider.GetRequiredService<ExecutorHelp>(),
-        };
-        // and run
-        return await executor.RunAsync();
+            // create service provider
+            var serviceBuilder = new ServiceCollection();
+            this.ConfigureServiceBuilder(configuration, serviceBuilder);
+            serviceBuilder.AddLogging((loggingBuilder) => this.ConfigureLogging(configuration, serviceBuilder, loggingBuilder));
+            var serviceProvider = serviceBuilder.BuildServiceProvider();
+
+            // create executor
+            Executor executor = command switch {
+                ApplicationCommand.Help => serviceProvider.GetRequiredService<ExecutorHelp>(),
+                ApplicationCommand.ScanFolder => serviceProvider.GetRequiredService<ExecutorScanFolder>(),
+                ApplicationCommand.Copy => serviceProvider.GetRequiredService<ExecutorCopy>(),
+                ApplicationCommand.Update => serviceProvider.GetRequiredService<ExecutorUpdate>(),
+                ApplicationCommand.Diff => serviceProvider.GetRequiredService<ExecutorDiff>(),
+                _ => serviceProvider.GetRequiredService<ExecutorHelp>(),
+            };
+            // and run
+            return await executor.RunAsync();
+        } catch (System.Exception error) {
+            System.Console.Error.WriteLine(error.ToString());
+            return 1;
+        }
     }
 
     public virtual (ApplicationCommand command, string[] remainingArgs) SplitAction(string[] args) {
@@ -46,7 +51,6 @@ public class Program {
                 "copy" => ApplicationCommand.Copy,
                 "update" => ApplicationCommand.Update,
                 "diff" => ApplicationCommand.Diff,
-                "patch" => ApplicationCommand.Patch,
                 "showconfig" => ApplicationCommand.ShowConfig,
                 "help" => ApplicationCommand.Help,
                 _ => ApplicationCommand.Unknown,
@@ -77,7 +81,6 @@ public class Program {
         serviceBuilder.AddSingleton<ExecutorCopy>();
         serviceBuilder.AddSingleton<ExecutorUpdate>();
         serviceBuilder.AddSingleton<ExecutorDiff>();
-        serviceBuilder.AddSingleton<ExecutorPatch>();
         serviceBuilder.AddSingleton<ExecutorHelp>();
         serviceBuilder.AddSingleton<AppConfigurationService>();
         serviceBuilder.AddSingleton<FileSettingService>();

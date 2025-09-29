@@ -1,5 +1,5 @@
 ﻿/*
- * Diff Match and Patch
+ * ShowDiff Match and Patch
  * Copyright 2018 The diff-match-patch Authors.
  * https://github.com/google/diff-match-patch
  *
@@ -42,7 +42,7 @@ public sealed class Diff {
     }
 
     /**
-     * Display a human-readable version of this Diff.
+     * Display a human-readable version of this ShowDiff.
      * @return text version.
      */
     public override string ToString() {
@@ -51,8 +51,8 @@ public sealed class Diff {
     }
 
     /**
-     * Is this Diff equivalent to another Diff?
-     * @param d Another Diff to compare against.
+     * Is this ShowDiff equivalent to another ShowDiff?
+     * @param d Another ShowDiff to compare against.
      * @return true or false.
      */
     public override bool Equals(object? obj) {
@@ -61,7 +61,7 @@ public sealed class Diff {
             return false;
         }
 
-        // If parameter cannot be cast to Diff return false.
+        // If parameter cannot be cast to ShowDiff return false.
         if (obj is not Diff p) {
             return false;
         }

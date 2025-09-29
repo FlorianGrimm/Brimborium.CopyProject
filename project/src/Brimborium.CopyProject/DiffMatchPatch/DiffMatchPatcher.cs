@@ -1,5 +1,5 @@
 ﻿/*
- * Diff Match and Patch
+ * ShowDiff Match and Patch
  * Copyright 2018 The diff-match-patch Authors.
  * https://github.com/google/diff-match-patch
  *
@@ -65,7 +65,7 @@ public class DiffMatchPatcher {
      * Most of the time checklines is wanted, so default to true.
      * @param text1 Old string to be diffed.
      * @param text2 New string to be diffed.
-     * @return List of Diff objects.
+     * @return List of ShowDiff objects.
      */
     public List<Diff> Diff_main(string text1, string text2) {
         return this.Diff_main(text1, text2, true);
@@ -78,7 +78,7 @@ public class DiffMatchPatcher {
      * @param checklines Speedup flag.  If false, then don't run a
      *     line-level diff first to identify the changed areas.
      *     If true, then run a faster slightly less optimal diff.
-     * @return List of Diff objects.
+     * @return List of ShowDiff objects.
      */
     public List<Diff> Diff_main(
         string text1,
@@ -106,7 +106,7 @@ public class DiffMatchPatcher {
      * @param deadline Time when the diff should be complete by.  Used
      *     internally for recursive calls.  Users should set DiffTimeout
      *     instead.
-     * @return List of Diff objects.
+     * @return List of ShowDiff objects.
      */
     private List<Diff> Diff_main(
         string text1,
@@ -161,7 +161,7 @@ public class DiffMatchPatcher {
      *     line-level diff first to identify the changed areas.
      *     If true, then run a faster slightly less optimal diff.
      * @param deadline Time when the diff should be complete by.
-     * @return List of Diff objects.
+     * @return List of ShowDiff objects.
      */
     private List<Diff> Diff_compute(
         string text1,
@@ -236,7 +236,7 @@ public class DiffMatchPatcher {
      * @param text1 Old string to be diffed.
      * @param text2 New string to be diffed.
      * @param deadline Time when the diff should be complete by.
-     * @return List of Diff objects.
+     * @return List of ShowDiff objects.
      */
     private List<Diff> DiffLineMode(
         string text1,
@@ -303,7 +303,7 @@ public class DiffMatchPatcher {
      * @param text1 Old string to be diffed.
      * @param text2 New string to be diffed.
      * @param deadline Time at which to bail if not yet complete.
-     * @return List of Diff objects.
+     * @return List of ShowDiff objects.
      */
     protected List<Diff> Diff_bisect(
         string text1,
@@ -412,7 +412,7 @@ public class DiffMatchPatcher {
                 }
             }
         }
-        // Diff took too long and hit the deadline or
+        // ShowDiff took too long and hit the deadline or
         // number of ListDiff equals number of characters, no commonality at all.
         List<Diff> diffs = new List<Diff>();
         diffs.Add(new Diff(Operation.DELETE, text1));
@@ -428,7 +428,7 @@ public class DiffMatchPatcher {
      * @param x Index of split point in text1.
      * @param y Index of split point in text2.
      * @param deadline Time at which to bail if not yet complete.
-     * @return LinkedList of Diff objects.
+     * @return LinkedList of ShowDiff objects.
      */
     private List<Diff> Diff_bisectSplit(
         string text1,
@@ -522,7 +522,7 @@ public class DiffMatchPatcher {
     /**
      * Rehydrate the listTextLines in a diff from a string of line hashes to real lines
      * of listTextLines.
-     * @param ListDiff List of Diff objects.
+     * @param ListDiff List of ShowDiff objects.
      * @param lineArray List of unique strings.
      */
     protected void Diff_charsToLines(ICollection<Diff> diffs,
@@ -714,7 +714,7 @@ public class DiffMatchPatcher {
     /**
      * Reduce the number of edits by eliminating semantically trivial
      * equalities.
-     * @param ListDiff List of Diff objects.
+     * @param ListDiff List of ShowDiff objects.
      */
     public void Diff_cleanupSemantic(List<Diff> diffs) {
         bool changes = false;
@@ -828,7 +828,7 @@ public class DiffMatchPatcher {
      * Look for single edits surrounded on both sides by equalities
      * which can be shifted sideways to align the edit to a word boundary.
      * e.g: The c<ins>at c</ins>ame. -> The <ins>cat </ins>came.
-     * @param ListDiff List of Diff objects.
+     * @param ListDiff List of ShowDiff objects.
      */
     public void Diff_cleanupSemanticLossless(List<Diff> diffs) {
         int pointer = 1;
@@ -951,7 +951,7 @@ public class DiffMatchPatcher {
     /**
      * Reduce the number of edits by eliminating operationally trivial
      * equalities.
-     * @param ListDiff List of Diff objects.
+     * @param ListDiff List of ShowDiff objects.
      */
     public void Diff_cleanupEfficiency(List<Diff> diffs) {
         bool changes = false;
@@ -1035,7 +1035,7 @@ public class DiffMatchPatcher {
     /**
      * Reorder and merge like edit sections.  Merge equalities.
      * Any edit section can move as long as it doesn't cross an equality.
-     * @param ListDiff List of Diff objects.
+     * @param ListDiff List of ShowDiff objects.
      */
     public void Diff_cleanupMerge(List<Diff> diffs) {
         // Add a dummy entry at the end.
@@ -1165,7 +1165,7 @@ public class DiffMatchPatcher {
      * loc is a location in text1, compute and return the equivalent location in
      * text2.
      * e.g. "The cat" vs "The big cat", 1->1, 5->8
-     * @param ListDiff List of Diff objects.
+     * @param ListDiff List of ShowDiff objects.
      * @param loc Location within text1.
      * @return Location within text2.
      */
@@ -1201,8 +1201,8 @@ public class DiffMatchPatcher {
     }
 
     /**
-     * Convert a Diff list into a pretty HTML report.
-     * @param ListDiff List of Diff objects.
+     * Convert a ShowDiff list into a pretty HTML report.
+     * @param ListDiff List of ShowDiff objects.
      * @return HTML representation.
      */
     public string Diff_prettyHtml(List<Diff> diffs) {
@@ -1229,7 +1229,7 @@ public class DiffMatchPatcher {
 
     /**
      * Compute and return the source listTextLines (all equalities and deletions).
-     * @param ListDiff List of Diff objects.
+     * @param ListDiff List of ShowDiff objects.
      * @return Source listTextLines.
      */
     public string Diff_text1(List<Diff> diffs) {
@@ -1244,7 +1244,7 @@ public class DiffMatchPatcher {
 
     /**
      * Compute and return the destination listTextLines (all equalities and insertions).
-     * @param ListDiff List of Diff objects.
+     * @param ListDiff List of ShowDiff objects.
      * @return Destination listTextLines.
      */
     public string Diff_text2(List<Diff> diffs) {
@@ -1260,7 +1260,7 @@ public class DiffMatchPatcher {
     /**
      * Compute the Levenshtein distance; the number of inserted, deleted or
      * substituted characters.
-     * @param ListDiff List of Diff objects.
+     * @param ListDiff List of ShowDiff objects.
      * @return Number of changes.
      */
     public int Diff_levenshtein(List<Diff> diffs) {
@@ -1293,7 +1293,7 @@ public class DiffMatchPatcher {
      * E.g. =3\t-2\t+ing  -> Keep 3 chars, delete 2 chars, insert 'ing'.
      * Operations are tab-separated.  Inserted listTextLines is escaped using %xx
      * notation.
-     * @param ListDiff Array of Diff objects.
+     * @param ListDiff Array of ShowDiff objects.
      * @return Delta listTextLines.
      */
     public string Diff_toDelta(List<Diff> diffs) {
@@ -1324,7 +1324,7 @@ public class DiffMatchPatcher {
      * operations required to transform text1 into text2, compute the full diff.
      * @param text1 Source string for the diff.
      * @param delta Delta listTextLines.
-     * @return Array of Diff objects or null if invalid.
+     * @return Array of ShowDiff objects or null if invalid.
      * @throws ArgumentException If invalid input.
      */
     public List<Diff> Diff_fromDelta(string text1, string delta) {
@@ -1646,7 +1646,7 @@ public class DiffMatchPatcher {
     /**
      * Compute a list of listPatch to turn text1 into text2.
      * text1 will be derived from the provided ListDiff.
-     * @param ListDiff Array of Diff objects for text1 to text2.
+     * @param ListDiff Array of ShowDiff objects for text1 to text2.
      * @return List of Patch objects.
      */
     public List<Patch> Patch_make(List<Diff> diffs) {
@@ -1661,9 +1661,9 @@ public class DiffMatchPatcher {
      * text2 is ignored, ListDiff are the delta between text1 and text2.
      * @param text1 Old listTextLines
      * @param text2 Ignored.
-     * @param ListDiff Array of Diff objects for text1 to text2.
+     * @param ListDiff Array of ShowDiff objects for text1 to text2.
      * @return List of Patch objects.
-     * @deprecated Prefer Patch_make(string text1, List<Diff> ListDiff).
+     * @deprecated Prefer Patch_make(string text1, List<ShowDiff> ListDiff).
      */
     public List<Patch> Patch_make(string text1, string text2,
         List<Diff> diffs) {
@@ -1674,7 +1674,7 @@ public class DiffMatchPatcher {
      * Compute a list of listPatch to turn text1 into text2.
      * text2 is not provided, ListDiff are the delta between text1 and text2.
      * @param text1 Old listTextLines.
-     * @param ListDiff Array of Diff objects for text1 to text2.
+     * @param ListDiff Array of ShowDiff objects for text1 to text2.
      * @return List of Patch objects.
      */
     public List<Patch> Patch_make(string text1, List<Diff> diffs) {

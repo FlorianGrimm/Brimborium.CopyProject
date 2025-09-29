@@ -1,3 +1,5 @@
+using System.Text.Json;
+
 namespace Brimborium.CopyProject;
 
 public sealed partial class AppConfigurationService {
@@ -68,5 +70,79 @@ public sealed partial class AppConfigurationService {
             throw new InvalidOperationException($"SettingsFile '{fullPath}' does not exist.");
         }
         return this._SettingsFile = fullPath;
+    }
+
+    public CopyProjectSettings LoadCopyProjectSettings() {
+        var settingsFile = this.GetSettingsFile();
+
+        var options = GetJsonSerializerOptions();
+        CopyProjectSettings? settings;
+        using (var json = System.IO.File.OpenRead(settingsFile)) {
+            settings = System.Text.Json.JsonSerializer.Deserialize<CopyProjectSettings>(json, options);
+        }
+        if (settings is null) {
+            throw new InvalidOperationException($"Cannot deserialize '{settingsFile}'.");
+        }
+        return settings;
+    }
+
+    public void SaveCopyProjectSettings(
+        CopyProjectSettings value) {
+        var settingsFile = this.GetSettingsFile();
+        var options = GetJsonSerializerOptions();
+            
+        using (var jsonStream = System.IO.File.Create(settingsFile)) {
+            System.Text.Json.JsonSerializer.Serialize(
+                jsonStream, 
+                value, 
+                options);
+        }
+    }
+
+    public List<CopyFileSettings> LoadCopyFileSettings(string filename) {
+        var settingsFolder = this.GetSettingsFolder();
+        var fullPath = System.IO.Path.GetFullPath(
+                System.IO.Path.Combine(
+                    settingsFolder, 
+                    filename));
+        if (!System.IO.File.Exists(fullPath)) {
+            return [];
+        }
+        var options = GetJsonSerializerOptions();
+        using (var json = System.IO.File.Open(fullPath, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.Read)) {
+            var settings = System.Text.Json.JsonSerializer.Deserialize<List<CopyFileSettings>>(json, options);
+            //if (settings is null) {
+            //    throw new InvalidOperationException($"Cannot deserialize '{fullPath}'.");
+            //}
+            return settings ?? [];
+        }
+    }
+
+    public void SaveCopyFileSettings(
+        string filename,
+        List<CopyFileSettings> listCopyFileSettings) {
+        var settingsFolder = this.GetSettingsFolder();
+        var fullPath = System.IO.Path.GetFullPath(
+                System.IO.Path.Combine(
+                    settingsFolder, 
+                    filename));
+        var options = GetJsonSerializerOptions();
+            
+        using (var jsonStream = System.IO.File.Create(fullPath)) {
+            System.Text.Json.JsonSerializer.Serialize(
+                jsonStream, 
+                listCopyFileSettings, 
+                options);
+        }
+    }
+
+    private static JsonSerializerOptions? _JsonSerializerOptions;
+    public static JsonSerializerOptions? GetJsonSerializerOptions() {
+        return _JsonSerializerOptions ??= new System.Text.Json.JsonSerializerOptions() {
+            PropertyNameCaseInsensitive = true,
+            ReadCommentHandling = System.Text.Json.JsonCommentHandling.Skip,
+            AllowTrailingCommas = true,
+            WriteIndented = true
+        };
     }
 }
