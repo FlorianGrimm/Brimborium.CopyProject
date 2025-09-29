@@ -23,11 +23,7 @@
  *   mono DiffMatchPatchTest.exe
 */
 
-using DiffMatchPatch;
-using System.Collections.Generic;
-using System;
-using System.Text;
-using System.Threading.Tasks;
+namespace Brimborium.CopyProject.DiffMatchPatch;
 
 public class diff_match_patchTest : DiffMatchPatcher {
     private void diff_commonPrefixTest() {
@@ -96,29 +92,29 @@ public class diff_match_patchTest : DiffMatchPatcher {
         tmpVector.Add("");
         tmpVector.Add("alpha\n");
         tmpVector.Add("beta\n");
-        Object[] result = this.Diff_linesToChars("alpha\nbeta\nalpha\n", "beta\nalpha\nbeta\n");
-        assertEquals("diff_linesToChars: Shared lines #1.", "\u0001\u0002\u0001", (string)result[0]);
-        assertEquals("diff_linesToChars: Shared lines #2.", "\u0002\u0001\u0002", (string)result[1]);
-        assertEquals("diff_linesToChars: Shared lines #3.", tmpVector, (List<string>)result[2]);
+        var (text1, text2, linearray) = this.Diff_linesToChars("alpha\nbeta\nalpha\n", "beta\nalpha\nbeta\n");
+        assertEquals("diff_linesToChars: Shared lines #1.", "\u0001\u0002\u0001", text1);
+        assertEquals("diff_linesToChars: Shared lines #2.", "\u0002\u0001\u0002", (string)text2);
+        assertEquals("diff_linesToChars: Shared lines #3.", tmpVector, (List<string>)linearray);
 
         tmpVector.Clear();
         tmpVector.Add("");
         tmpVector.Add("alpha\r\n");
         tmpVector.Add("beta\r\n");
         tmpVector.Add("\r\n");
-        result = this.Diff_linesToChars("", "alpha\r\nbeta\r\n\r\n\r\n");
-        assertEquals("diff_linesToChars: Empty string and blank lines #1.", "", (string)result[0]);
-        assertEquals("diff_linesToChars: Empty string and blank lines #2.", "\u0001\u0002\u0003\u0003", (string)result[1]);
-        assertEquals("diff_linesToChars: Empty string and blank lines #3.", tmpVector, (List<string>)result[2]);
+        (text1, text2, linearray) = this.Diff_linesToChars("", "alpha\r\nbeta\r\n\r\n\r\n");
+        assertEquals("diff_linesToChars: Empty string and blank lines #1.", "", text1);
+        assertEquals("diff_linesToChars: Empty string and blank lines #2.", "\u0001\u0002\u0003\u0003", text2);
+        assertEquals("diff_linesToChars: Empty string and blank lines #3.", tmpVector, linearray);
 
         tmpVector.Clear();
         tmpVector.Add("");
         tmpVector.Add("a");
         tmpVector.Add("b");
-        result = this.Diff_linesToChars("a", "b");
-        assertEquals("diff_linesToChars: No linebreaks #1.", "\u0001", (string)result[0]);
-        assertEquals("diff_linesToChars: No linebreaks #2.", "\u0002", (string)result[1]);
-        assertEquals("diff_linesToChars: No linebreaks #3.", tmpVector, (List<string>)result[2]);
+        (text1, text2, linearray) = this.Diff_linesToChars("a", "b");
+        assertEquals("diff_linesToChars: No linebreaks #1.", "\u0001", text1);
+        assertEquals("diff_linesToChars: No linebreaks #2.", "\u0002", text2);
+        assertEquals("diff_linesToChars: No linebreaks #3.", tmpVector, linearray);
 
         // More than 256 to reveal any 8-bit limitations.
         int n = 300;
@@ -135,10 +131,10 @@ public class diff_match_patchTest : DiffMatchPatcher {
         string chars = charList.ToString();
         assertEquals("Test initialization fail #2.", n, chars.Length);
         tmpVector.Insert(0, "");
-        result = this.Diff_linesToChars(lines, "");
-        assertEquals("diff_linesToChars: More than 256 #1.", chars, (string)result[0]);
-        assertEquals("diff_linesToChars: More than 256 #2.", "", (string)result[1]);
-        assertEquals("diff_linesToChars: More than 256 #3.", tmpVector, (List<string>)result[2]);
+        (text1, text2, linearray) = this.Diff_linesToChars(lines, "");
+        assertEquals("diff_linesToChars: More than 256 #1.", chars, text1);
+        assertEquals("diff_linesToChars: More than 256 #2.", "", text2);
+        assertEquals("diff_linesToChars: More than 256 #3.", tmpVector, linearray);
     }
 
     private void diff_charsToLinesTest() {
@@ -186,9 +182,9 @@ public class diff_match_patchTest : DiffMatchPatcher {
             lineList.Append(i + "\n");
         }
         chars = lineList.ToString();
-        Object[] result = this.Diff_linesToChars(chars, "");
-        diffs = new List<Diff> { new Diff(Operation.INSERT, (string)result[0]) };
-        this.Diff_charsToLines(diffs, (List<string>)result[2]);
+        var (text1, text2, linearray) = this.Diff_linesToChars(chars, "");
+        diffs = new List<Diff> { new Diff(Operation.INSERT, text1) };
+        this.Diff_charsToLines(diffs, linearray);
         assertEquals("diff_charsToLines: More than 65536.", chars, diffs[0].Text);
     }
 
@@ -842,7 +838,7 @@ public class diff_match_patchTest : DiffMatchPatcher {
         p.Start2 = 21;
         p.Length1 = 18;
         p.Length2 = 17;
-        p.diffs = new List<Diff> {
+        p.ListDiff = new List<Diff> {
         new Diff(Operation.EQUAL, "jump"),
         new Diff(Operation.DELETE, "s"),
         new Diff(Operation.INSERT, "ed"),
@@ -944,7 +940,7 @@ public class diff_match_patchTest : DiffMatchPatcher {
         new Diff(Operation.INSERT, "~!@#$%^&*()_+{}|:\"<>?")};
         assertEquals("patch_fromText: Character decoding.",
             diffs,
-            this.Patch_fromText("@@ -1,21 +1,21 @@\n-%601234567890-=%5B%5D%5C;',./\n+~!@#$%25%5E&*()_+%7B%7D%7C:%22%3C%3E?\n")[0].diffs);
+            this.Patch_fromText("@@ -1,21 +1,21 @@\n-%601234567890-=%5B%5D%5C;',./\n+~!@#$%25%5E&*()_+%7B%7D%7C:%22%3C%3E?\n")[0].ListDiff);
 
         text1 = "";
         for (int x = 0; x < 100; x++) {
@@ -1099,10 +1095,10 @@ public class diff_match_patchTest : DiffMatchPatcher {
     private string[] diff_rebuildtexts(List<Diff> diffs) {
         string[] text = { "", "" };
         foreach (Diff myDiff in diffs) {
-            if (myDiff.operation != Operation.INSERT) {
+            if (myDiff.Operation != Operation.INSERT) {
                 text[0] += myDiff.Text;
             }
-            if (myDiff.operation != Operation.DELETE) {
+            if (myDiff.Operation != Operation.DELETE) {
                 text[1] += myDiff.Text;
             }
         }
@@ -1193,7 +1189,7 @@ public class diff_match_patchTest : DiffMatchPatcher {
     }
 
     [Test]
-    public async Task Run() {
+    public async Task DiffMatchPatchTests() {
         diff_match_patchTest dmp = new diff_match_patchTest();
 
         dmp.diff_commonPrefixTest();

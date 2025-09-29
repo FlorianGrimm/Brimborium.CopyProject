@@ -20,7 +20,3 @@ global using global::TUnit.Core.Interfaces;
 
 global using global::VerifyTests;
 global using global::VerifyTUnit;
-
-global using global::Microsoft.Playwright;
-global using global::TUnit.Playwright;
-

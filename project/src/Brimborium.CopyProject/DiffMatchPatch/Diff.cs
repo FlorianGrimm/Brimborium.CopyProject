@@ -22,13 +22,13 @@
 namespace Brimborium.CopyProject.DiffMatchPatch;
 
 /**
- * Class representing one diff operation.
+ * Class representing one diff Operation.
  */
-public class Diff {
-    public Operation operation;
+public sealed class Diff {
+    public Operation Operation;
     // One of: INSERT, DELETE or EQUAL.
     public string Text;
-    // The text associated with this diff operation.
+    // The text associated with this diff Operation.
 
     /**
      * Constructor.  Initializes the diff with the provided values.
@@ -36,8 +36,8 @@ public class Diff {
      * @param text The text being applied.
      */
     public Diff(Operation operation, string text) {
-        // Construct a diff with the specified operation and text.
-        this.operation = operation;
+        // Construct a diff with the specified Operation and text.
+        this.Operation = operation;
         this.Text = text;
     }
 
@@ -47,7 +47,7 @@ public class Diff {
      */
     public override string ToString() {
         string prettyText = this.Text.Replace('\n', '\u00b6');
-        return "Diff(" + this.operation + ",\"" + prettyText + "\")";
+        return "Diff(" + this.Operation + ",\"" + prettyText + "\")";
     }
 
     /**
@@ -67,7 +67,7 @@ public class Diff {
         }
 
         // Return true if the fields match.
-        return p.operation == this.operation && p.Text == this.Text;
+        return p.Operation == this.Operation && p.Text == this.Text;
     }
 
     public bool Equals(Diff obj) {
@@ -77,10 +77,9 @@ public class Diff {
         }
 
         // Return true if the fields match.
-        return obj.operation == this.operation && obj.Text == this.Text;
+        return obj.Operation == this.Operation && obj.Text == this.Text;
     }
 
-    public override int GetHashCode() {
-        return this.Text.GetHashCode() ^ this.operation.GetHashCode();
-    }
+    public override int GetHashCode() 
+        => HashCode.Combine(this.Text, this.Operation);
 }

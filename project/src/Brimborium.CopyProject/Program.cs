@@ -79,6 +79,7 @@ public class Program {
         serviceBuilder.AddSingleton<ExecutorDiff>();
         serviceBuilder.AddSingleton<ExecutorPatch>();
         serviceBuilder.AddSingleton<ExecutorHelp>();
+        serviceBuilder.AddSingleton<AppConfigurationService>();
         serviceBuilder.AddSingleton<FileSettingService>();
         serviceBuilder.AddSingleton<FileSystemService>();
     }

@@ -25,9 +25,9 @@ namespace Brimborium.CopyProject.DiffMatchPatch;
 
 
 /**
- * Class representing one patch operation.
+ * Class representing one patch Operation.
  */
-public class Patch {
+public sealed class Patch {
     public List<Diff> ListDiff = new List<Diff>();
     public int Start1;
     public int Start2;
@@ -61,7 +61,7 @@ public class Patch {
             .Append(" @@\n");
         // Escape the body of the patch with %xx notation.
         foreach (Diff aDiff in this.ListDiff) {
-            switch (aDiff.operation) {
+            switch (aDiff.Operation) {
                 case Operation.INSERT:
                     text.Append('+');
                     break;
