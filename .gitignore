@@ -416,3 +416,5 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+project/test/Brimborium.CopyProject.Tests/sample1/dst

@@ -1,7 +1,7 @@
 [
   {
     "Path": "b1.txt",
-    "Action": "copy"
+    "Action": ""
   },
   {
     "Path": "b2/b3.txt",

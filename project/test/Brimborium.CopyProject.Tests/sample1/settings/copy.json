@@ -5,12 +5,13 @@
       "SettingsName": "a",
       "SourcePath": "src/a",
       "TargetPath": "dst/a",
-      "ExcludeFolderNames": ["ignore"]
+      "ExcludeFolderNames": [ "ignore" ]
     },
     {
       "SettingsName": "b.json",
       "SourcePath": "src/b",
-      "TargetPath": "dst/b"
+      "TargetPath": "dst/b",
+      "DiffPath": "dif/b"
     }
   ]
 }

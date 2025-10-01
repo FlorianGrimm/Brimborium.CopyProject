@@ -19,6 +19,14 @@ public class ExecutorTests {
         }
         System.IO.Directory.CreateDirectory(dstPath);
 
+
+        var difPath = System.IO.Path.Combine(rootPath, "dif");
+        if (System.IO.Directory.Exists(difPath)) {
+            System.IO.Directory.Delete(difPath, true);
+        }
+        System.IO.Directory.CreateDirectory(difPath);
+        System.IO.Directory.CreateDirectory(System.IO.Path.Combine(difPath, "b"));
+
         // 1 ScanFolder
         {
             var program = new Program();
@@ -128,7 +136,10 @@ public class ExecutorTests {
                   }
                 ]
                 """);
-            System.IO.File.Delete(@"C:\github\FlorianGrimm\Brimborium.CodeAsCode\submodule\Brimborium.CopyProject\project\test\Brimborium.CopyProject.Tests\sample1\dst\b\b2\b3.txt");
+            System.IO.File.Delete(
+                System.IO.Path.Combine(
+                    rootPath,
+                    @"dst\b\b2\b3.txt"));
             {
                 var program = new Program();
                 var result = await program.RunAsync(new string[] {
@@ -152,6 +163,57 @@ public class ExecutorTests {
                 ]
                 """);
         }
+
+        // 5 Update
+        {
+            System.IO.File.WriteAllText(bPath,
+                """
+                [
+                  {
+                    "Path": "b1.txt",
+                    "Action": ""
+                  },
+                  {
+                    "Path": "b2/b3.txt",
+                    "Action": "delete"
+                  }
+                ]
+                """);
+            System.IO.File.WriteAllText(
+                System.IO.Path.Combine(
+                    rootPath,
+                    @"dst\b\b1.txt"),
+                """
+                b1
+                11
+                55
+                33
+                """);
+            {
+                var program = new Program();
+                var result = await program.RunAsync(new string[] {
+                    "Update",
+                    "--RootFolder", rootPath,
+                    "--SettingsFile", @$"{rootPath}\settings\copy.json"
+                });
+                await Assert.That(result).IsEqualTo(0);
+            }
+            await Assert.That(System.IO.File.ReadAllText(bPath)).IsEqualTo(
+                """
+                [
+                  {
+                    "Path": "b1.txt",
+                    "Action": "diff"
+                  },
+                  {
+                    "Path": "b2/b3.txt",
+                    "Action": "delete"
+                  }
+                ]
+                """);
+        }
+
+
     }
 
     private static string GetFolderPath([CallerFilePath] string path = "")

@@ -38,24 +38,34 @@ public sealed class ContentMapping {
             if (relativeFile.ActionE == CopyFileSettingsAction.Default) {
                 string srcFileContent = this.Src.ReadFile(relativeFile.RelativePath);
                 string dstFileContent = this.Dst.ReadFile(relativeFile.RelativePath);
+
                 if (this.CompareFileContent(srcFileContent, dstFileContent)) {
                     // ok
                     relativeFile.ActionE = CopyFileSettingsAction.Copy;
                     result = true;
                     this._Logger.UpdateAction(relativeFile.RelativePath, relativeFile.ActionE);
+                    continue;
 
                 } else if (string.IsNullOrEmpty(srcFileContent)) {
                     relativeFile.ActionE = CopyFileSettingsAction.Delete;
                     result = true;
                     this._Logger.UpdateAction(relativeFile.RelativePath, relativeFile.ActionE);
+                    continue;
 
                 } else if (string.IsNullOrEmpty(dstFileContent)) {
                     relativeFile.ActionE = CopyFileSettingsAction.Delete;
                     result = true;
                     this._Logger.UpdateAction(relativeFile.RelativePath, relativeFile.ActionE);
-                }
+                    continue;
 
-            } else if (relativeFile.ActionE == CopyFileSettingsAction.Copy) {
+                } else {
+                    relativeFile.ActionE = CopyFileSettingsAction.Diff;
+                    result = true;
+                    this._Logger.UpdateAction(relativeFile.RelativePath, relativeFile.ActionE);
+                }
+            }
+
+            if (relativeFile.ActionE == CopyFileSettingsAction.Copy) {
                 string srcFileContent = this.Src.ReadFile(relativeFile.RelativePath);
                 string dstFileContent = this.Dst.ReadFile(relativeFile.RelativePath);
                 if (this.CompareFileContent(srcFileContent, dstFileContent)) {
@@ -64,11 +74,13 @@ public sealed class ContentMapping {
                     relativeFile.ActionE = CopyFileSettingsAction.Delete;
                     result = true;
                     this._Logger.UpdateAction(relativeFile.RelativePath, relativeFile.ActionE);
+                    continue;
 
                 } else if (string.IsNullOrEmpty(dstFileContent)) {
                     relativeFile.ActionE = CopyFileSettingsAction.Delete;
                     result = true;
                     this._Logger.UpdateAction(relativeFile.RelativePath, relativeFile.ActionE);
+                    continue;
 
                 } else {
                     relativeFile.ActionE = CopyFileSettingsAction.Diff;
@@ -76,12 +88,29 @@ public sealed class ContentMapping {
                     this._Logger.UpdateAction(relativeFile.RelativePath, relativeFile.ActionE);
                 }
 
-            } else if (relativeFile.ActionE == CopyFileSettingsAction.Delete) {
-                //
+            }
 
-            } else if (relativeFile.ActionE == CopyFileSettingsAction.Diff) {
+            if (relativeFile.ActionE == CopyFileSettingsAction.Delete) {
+                //
+            }
+
+            if (relativeFile.ActionE == CopyFileSettingsAction.Diff) {
                 //
                 // TODO: create diff
+                /*
+                if (this.Diff is { }) {
+                    string srcFileContent = this.Src.ReadFile(relativeFile.RelativePath);
+                    string dstFileContent = this.Dst.ReadFile(relativeFile.RelativePath);
+                    var diffAbsolutePath = this.Diff.GetAbsolutePath(relativeFile.RelativePath);
+                    Brimborium.CopyProject.DiffMatchPatch.DiffMatchPatcher diffMatchPatcher = new();
+                    var listDiff = diffMatchPatcher.Diff_main(srcFileContent, dstFileContent);
+                    using (var stream = System.IO.File.Create(diffAbsolutePath)) { 
+                        System.Text.Json.JsonSerializer.Serialize<List<Brimborium.CopyProject.DiffMatchPatch.Diff>>(
+                            stream, listDiff);
+                        stream.Flush();
+                    }
+                }
+                */
             }
         }
 

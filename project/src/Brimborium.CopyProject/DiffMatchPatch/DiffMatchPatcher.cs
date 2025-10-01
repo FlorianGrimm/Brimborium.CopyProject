@@ -29,7 +29,7 @@ namespace Brimborium.CopyProject.DiffMatchPatch;
  * Class containing the diff, match and patch methods.
  * Also Contains the behaviour settings.
  */
-public class DiffMatchPatcher {
+public sealed class DiffMatchPatcher {
     // Defaults.
     // Set these on your diff_match_patch instance to override the defaults.
 
@@ -1665,7 +1665,9 @@ public class DiffMatchPatcher {
      * @return List of Patch objects.
      * @deprecated Prefer Patch_make(string text1, List<ShowDiff> ListDiff).
      */
-    public List<Patch> Patch_make(string text1, string text2,
+    public List<Patch> Patch_make(
+        string text1,
+        string text2,
         List<Diff> diffs) {
         return this.Patch_make(text1, diffs);
     }
@@ -1677,7 +1679,9 @@ public class DiffMatchPatcher {
      * @param ListDiff Array of ShowDiff objects for text1 to text2.
      * @return List of Patch objects.
      */
-    public List<Patch> Patch_make(string text1, List<Diff> diffs) {
+    public List<Patch> Patch_make(
+        string text1,
+        List<Diff> diffs) {
         // Check for null inputs not needed since null can't be passed in C#.
         List<Patch> patches = new List<Patch>();
         if (diffs.Count == 0) {
