@@ -23,6 +23,8 @@
  *   mono DiffMatchPatchTest.exe
 */
 
+#pragma warning disable CS8604 // Possible null reference argument.
+
 namespace Brimborium.CopyProject.DiffMatchPatch;
 
 public class diff_match_patchTest : DiffMatchPatcher {

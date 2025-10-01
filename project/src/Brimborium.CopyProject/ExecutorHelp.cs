@@ -1,4 +1,3 @@
-
 namespace Brimborium.CopyProject;
 
 public class ExecutorHelp : Executor {
@@ -11,11 +10,12 @@ public class ExecutorHelp : Executor {
         System.Console.WriteLine("  Update - update the configuration file.");
         System.Console.WriteLine("  Diff - show the differences between the source and the target.");
         System.Console.WriteLine("  Patch - patch the target.");
+        System.Console.WriteLine("");
         System.Console.WriteLine("Options:");
-        System.Console.WriteLine("  Todo");
-        System.Console.WriteLine("  Todo");
-        System.Console.WriteLine("  Todo");
-        System.Console.WriteLine("  Todo");
+        System.Console.WriteLine("  RootMarkerFile");
+        System.Console.WriteLine("  RootFolder");
+        System.Console.WriteLine("  SettingsFile");
+        System.Console.WriteLine("  SettingsFolder");
         return Task.FromResult(0);
     }
 }

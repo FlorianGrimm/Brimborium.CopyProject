@@ -9,11 +9,9 @@ public sealed class CopyFileSettings {
 
     public CopyFileSettings(
         string path,
-        string? action = null,
-        string? targetPath = null) {
+        string? action = null) {
         this.Path = path;
         this.Action = action;
-        this.TargetPath = targetPath;
     }
 
     public string? Path { get; set; }
@@ -32,7 +30,6 @@ public sealed class CopyFileSettings {
             };
         }
     }
-    public string? TargetPath { get; set; }
 
     [System.Text.Json.Serialization.JsonIgnore]
     public CopyFileSettingsAction ActionE {

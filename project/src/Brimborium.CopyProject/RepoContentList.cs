@@ -1,13 +1,11 @@
-﻿using System.ComponentModel;
-
-namespace Brimborium.CopyProject;
+﻿namespace Brimborium.CopyProject;
 
 public sealed class RepoContentList {
     private readonly Dictionary<string, RepoFile> _DictFileAction = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, FileContent> _DictFileContent = new(StringComparer.OrdinalIgnoreCase);
-    private readonly string _RepoDir;
+    private readonly string _RepoAbsolutePath;
     private readonly string _RootRelativePath;
-    private readonly string _RootDir;
+    private readonly string _RootAbsolutePath;
     private readonly ExcludeSettings _ExcludeSettings;
 
     public Dictionary<string, RepoFile> DictFileAction => this._DictFileAction;
@@ -15,20 +13,19 @@ public sealed class RepoContentList {
     public Dictionary<string, FileContent> DictFileContent => this._DictFileContent;
 
     public RepoContentList(
-        string repoDir,
-        string rootRelativePath,
-        string rootDir,
+        string repoAbsolutePath,
+        string repoRelativePath,
+        string rootAbsolutePath,
         ExcludeSettings excludeSettings
         ) {
-        ArgumentNullException.ThrowIfNullOrEmpty(repoDir, nameof(repoDir));
-        ArgumentNullException.ThrowIfNullOrEmpty(rootRelativePath, nameof(rootRelativePath));
-        ArgumentNullException.ThrowIfNullOrEmpty(rootDir, nameof(rootDir));
-        this._RepoDir = repoDir;
-        this._RootRelativePath = rootRelativePath;
-        this._RootDir = rootDir;
+        ArgumentNullException.ThrowIfNullOrEmpty(repoAbsolutePath, nameof(repoAbsolutePath));
+        ArgumentNullException.ThrowIfNullOrEmpty(repoRelativePath, nameof(repoRelativePath));
+        ArgumentNullException.ThrowIfNullOrEmpty(rootAbsolutePath, nameof(rootAbsolutePath));
+        this._RepoAbsolutePath = repoAbsolutePath;
+        this._RootRelativePath = repoRelativePath;
+        this._RootAbsolutePath = rootAbsolutePath;
         this._ExcludeSettings = excludeSettings;
     }
-    //new string[] { ".git", ".github", ".vscode", "bin", "obj", "artifacts", "node_modules" });
 
     public static RepoContentList Create(
         string rootDir,
@@ -37,10 +34,18 @@ public sealed class RepoContentList {
         ArgumentNullException.ThrowIfNullOrEmpty(rootDir, nameof(rootDir));
         ArgumentNullException.ThrowIfNullOrEmpty(repoDir, nameof(repoDir));
 
-        var rootRelativePath = System.IO.Path.GetRelativePath(repoDir, rootDir);
+        string repoRelativePath;
+        string repoAbsolutePath;
+        if (System.IO.Path.IsPathFullyQualified(repoDir)) {
+            repoAbsolutePath = System.IO.Path.GetFullPath(repoDir);
+            repoRelativePath = System.IO.Path.GetRelativePath(repoDir, rootDir);
+        } else {
+            repoRelativePath = repoDir;
+            repoAbsolutePath = System.IO.Path.GetFullPath(System.IO.Path.Combine(rootDir, repoDir));
+        }
         return new RepoContentList(
-            repoDir,
-            rootRelativePath,
+            repoAbsolutePath,
+            repoRelativePath,
             rootDir,
             excludeSettings);
     }
@@ -73,46 +78,50 @@ public sealed class RepoContentList {
 
     public bool ScanFolder(string? folder = null) {
         if (string.IsNullOrEmpty(folder)) {
-            folder = this._RepoDir;
-        } else if (folder.StartsWith(this._RepoDir)) {
-            throw new Exception($"Folder {folder} is not in RepoDir {this._RepoDir}");
+            folder = this._RepoAbsolutePath;
+        } else if (!folder.StartsWith(this._RepoAbsolutePath, StringComparison.OrdinalIgnoreCase)) {
+            throw new Exception($"Folder {folder} is not in RepoDir {this._RepoAbsolutePath}");
         }
         if (System.IO.Directory.Exists(folder) is false) {
             return false;
         }
+        string repoDirWithSeparator = this._RepoAbsolutePath + System.IO.Path.DirectorySeparatorChar;
         System.Collections.Generic.List<string> listRelativeFile = new();
         System.IO.DirectoryInfo dirInfoFolder = new(folder);
-        var listDirInfo = dirInfoFolder.EnumerateDirectories(
-            "*",
-            new EnumerationOptions() {
-                RecurseSubdirectories = true,
-                MaxRecursionDepth = 10,
-                IgnoreInaccessible = true,
-                AttributesToSkip = FileAttributes.Hidden | FileAttributes.System
-            })
-            .Where(di => this._ExcludeSettings.IsIncludedPath(di.Name))
+
+        var listFileInfo = dirInfoFolder.EnumerateFiles("*", new EnumerationOptions() {
+            RecurseSubdirectories = false,
+            IgnoreInaccessible = true,
+            AttributesToSkip = FileAttributes.Hidden | FileAttributes.System
+        });
+        var listFileInfoFiltered = listFileInfo
+            //.Where(fi => !this.IsExcludedFileInfo(fi))
             .ToList();
 
-        string rootDirWithSeparator = this._RootDir + System.IO.Path.DirectorySeparatorChar;
+        foreach (var fileInfo in listFileInfoFiltered) {
+            string fullName = fileInfo.FullName;
+            if (!fullName.StartsWith(repoDirWithSeparator, StringComparison.OrdinalIgnoreCase)) {
+                continue;
+            }
+            string relativePath = fullName.Substring(repoDirWithSeparator.Length);
+            this.AddFile(relativePath, CopyFileSettingsAction.Default);
+        }
+
+        List<DirectoryInfo> listDirInfo = [];
+        listDirInfo.AddRange(
+            dirInfoFolder.EnumerateDirectories(
+                "*",
+                new EnumerationOptions() {
+                    RecurseSubdirectories = true,
+                    MaxRecursionDepth = 10,
+                    IgnoreInaccessible = true,
+                    AttributesToSkip = FileAttributes.Hidden | FileAttributes.System
+                })
+                .Where(di => this._ExcludeSettings.IsIncludedPath(di.Name))
+                );
 
         foreach (var di in listDirInfo) {
-            var listFileInfo = di.EnumerateFiles("*", new EnumerationOptions() {
-                RecurseSubdirectories = false,
-                IgnoreInaccessible = true,
-                AttributesToSkip = FileAttributes.Hidden | FileAttributes.System
-            });
-            var listFileInfoFiltered = listFileInfo
-                //.Where(fi => !this.IsExcludedFileInfo(fi))
-                .ToList();
-
-            foreach (var fileInfo in listFileInfoFiltered) {
-                string fullName = fileInfo.FullName;
-                if (!fullName.StartsWith(rootDirWithSeparator, StringComparison.OrdinalIgnoreCase)) {
-                    continue;
-                }
-                string relativePath = fullName.Substring(rootDirWithSeparator.Length);
-                this.AddFile(relativePath, CopyFileSettingsAction.Default);
-            }
+            this.ScanFolder(di.FullName);
         }
 
         return true;
@@ -141,18 +150,18 @@ public sealed class RepoContentList {
             return false;
         }
         string fullName = fileInfo.FullName;
-        if (!fullName.StartsWith(this._RepoDir, StringComparison.OrdinalIgnoreCase)) {
+        if (!fullName.StartsWith(this._RepoAbsolutePath, StringComparison.OrdinalIgnoreCase)) {
             return false;
         }
-        if (fullName.Length < this._RepoDir.Length) {
+        if (fullName.Length < this._RepoAbsolutePath.Length) {
             return false;
         }
-        string relativePath = fullName.Substring(this._RepoDir.Length + 1);
+        string relativePath = fullName.Substring(this._RepoAbsolutePath.Length + 1);
         return this._ExcludeSettings.IsIncludedPath(relativePath);
     }
 
     public string GetAbsolutePath(string relativePath) {
-        return System.IO.Path.Combine(this._RootDir, relativePath);
+        return System.IO.Path.Combine(this._RepoAbsolutePath, relativePath);
     }
 
     public string ReadFile(string relativePath) {

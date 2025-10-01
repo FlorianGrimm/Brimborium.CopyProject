@@ -6,38 +6,40 @@ using Microsoft.Extensions.Logging;
 namespace Brimborium.CopyProject;
 
 public class Program {
-    public static async Task<int> Main(string[] args)
-        => await new Program().RunAsync(args);
-
-    public async Task<int> RunAsync(string[] args) {
+    public static async Task<int> Main(string[] args) {
         try {
-            // parse args
-            var (command, remainingArgs) = this.SplitAction(args);
-
-            // create configuration
-            var configuration = this.CreateConfigurationBuilder(remainingArgs, new ConfigurationBuilder()).Build();
-
-            // create service provider
-            var serviceBuilder = new ServiceCollection();
-            this.ConfigureServiceBuilder(configuration, serviceBuilder);
-            serviceBuilder.AddLogging((loggingBuilder) => this.ConfigureLogging(configuration, serviceBuilder, loggingBuilder));
-            var serviceProvider = serviceBuilder.BuildServiceProvider();
-
-            // create executor
-            Executor executor = command switch {
-                ApplicationCommand.Help => serviceProvider.GetRequiredService<ExecutorHelp>(),
-                ApplicationCommand.ScanFolder => serviceProvider.GetRequiredService<ExecutorScanFolder>(),
-                ApplicationCommand.Copy => serviceProvider.GetRequiredService<ExecutorCopy>(),
-                ApplicationCommand.Update => serviceProvider.GetRequiredService<ExecutorUpdate>(),
-                ApplicationCommand.Diff => serviceProvider.GetRequiredService<ExecutorDiff>(),
-                _ => serviceProvider.GetRequiredService<ExecutorHelp>(),
-            };
-            // and run
-            return await executor.RunAsync();
+            return await new Program().RunAsync(args);
         } catch (System.Exception error) {
             System.Console.Error.WriteLine(error.ToString());
             return 1;
         }
+    }
+
+    public async Task<int> RunAsync(string[] args) {
+
+        // parse args
+        var (command, remainingArgs) = this.SplitAction(args);
+
+        // create configuration
+        var configuration = this.CreateConfigurationBuilder(remainingArgs, new ConfigurationBuilder()).Build();
+
+        // create service provider
+        var serviceBuilder = new ServiceCollection();
+        this.ConfigureServiceBuilder(configuration, serviceBuilder);
+        serviceBuilder.AddLogging((loggingBuilder) => this.ConfigureLogging(configuration, serviceBuilder, loggingBuilder));
+        var serviceProvider = serviceBuilder.BuildServiceProvider();
+
+        // create executor
+        Executor executor = command switch {
+            ApplicationCommand.Help => serviceProvider.GetRequiredService<ExecutorHelp>(),
+            ApplicationCommand.ScanFolder => serviceProvider.GetRequiredService<ExecutorScanFolder>(),
+            ApplicationCommand.Copy => serviceProvider.GetRequiredService<ExecutorCopy>(),
+            ApplicationCommand.Update => serviceProvider.GetRequiredService<ExecutorUpdate>(),
+            ApplicationCommand.Diff => serviceProvider.GetRequiredService<ExecutorDiff>(),
+            _ => serviceProvider.GetRequiredService<ExecutorHelp>(),
+        };
+        // and run
+        return await executor.RunAsync();
     }
 
     public virtual (ApplicationCommand command, string[] remainingArgs) SplitAction(string[] args) {

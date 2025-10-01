@@ -32,6 +32,7 @@ public class Speedtest {
         await Assert.That(elapsed).IsLessThan(1000);
         System.Console.Out.WriteLine($"Elapsed time: {elapsed} ms");
     }
+
     private static string GetFileName(string filename, [CallerFilePath] string path = "")
         => System.IO.Path.Combine(
             System.IO.Path.GetDirectoryName(path) ?? "",

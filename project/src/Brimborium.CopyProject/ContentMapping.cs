@@ -1,19 +1,22 @@
-﻿
-
-using System.Security.Cryptography;
+﻿using Microsoft.Extensions.Logging;
 
 namespace Brimborium.CopyProject;
-public class ContentMapping {
+
+public sealed class ContentMapping {
+    private readonly ILogger _Logger;
+
     public ContentMapping(
         CopyProjectMap copyProjectMap,
         RepoContentList src,
         RepoContentList dst,
-        RepoContentList? diff
+        RepoContentList? diff,
+        ILogger logger
         ) {
         this.CopyProjectMap = copyProjectMap;
         this.Src = src;
         this.Dst = dst;
         this.Diff = diff;
+        this._Logger = logger;
     }
 
     public CopyProjectMap CopyProjectMap { get; }
@@ -39,17 +42,17 @@ public class ContentMapping {
                     // ok
                     relativeFile.ActionE = CopyFileSettingsAction.Copy;
                     result = true;
-                    System.Console.Out.WriteLine($"copy:   {relativeFile.RelativePath}");
+                    this._Logger.UpdateAction(relativeFile.RelativePath, relativeFile.ActionE);
 
                 } else if (string.IsNullOrEmpty(srcFileContent)) {
                     relativeFile.ActionE = CopyFileSettingsAction.Delete;
                     result = true;
-                    System.Console.Out.WriteLine($"delete: {relativeFile.RelativePath}");
+                    this._Logger.UpdateAction(relativeFile.RelativePath, relativeFile.ActionE);
 
                 } else if (string.IsNullOrEmpty(dstFileContent)) {
                     relativeFile.ActionE = CopyFileSettingsAction.Delete;
                     result = true;
-                    System.Console.Out.WriteLine($"delete: {relativeFile.RelativePath}");
+                    this._Logger.UpdateAction(relativeFile.RelativePath, relativeFile.ActionE);
                 }
 
             } else if (relativeFile.ActionE == CopyFileSettingsAction.Copy) {
@@ -60,17 +63,17 @@ public class ContentMapping {
                 } else if (string.IsNullOrEmpty(srcFileContent)) {
                     relativeFile.ActionE = CopyFileSettingsAction.Delete;
                     result = true;
-                    System.Console.Out.WriteLine($"delete: {relativeFile.RelativePath}");
+                    this._Logger.UpdateAction(relativeFile.RelativePath, relativeFile.ActionE);
 
                 } else if (string.IsNullOrEmpty(dstFileContent)) {
                     relativeFile.ActionE = CopyFileSettingsAction.Delete;
                     result = true;
-                    System.Console.Out.WriteLine($"delete: {relativeFile.RelativePath}");
+                    this._Logger.UpdateAction(relativeFile.RelativePath, relativeFile.ActionE);
 
                 } else {
                     relativeFile.ActionE = CopyFileSettingsAction.Diff;
                     result = true;
-                    System.Console.Out.WriteLine($"diff:   {relativeFile.RelativePath}");
+                    this._Logger.UpdateAction(relativeFile.RelativePath, relativeFile.ActionE);
                 }
 
             } else if (relativeFile.ActionE == CopyFileSettingsAction.Delete) {
@@ -100,7 +103,7 @@ public class ContentMapping {
                 }
                 if (System.IO.File.Exists(srcPath) && !System.IO.File.Exists(dstPath)) {
                     System.IO.File.Copy(srcPath, dstPath, true);
-                    System.Console.Out.WriteLine($"copy:   {relativeFile.RelativePath}");
+                    this._Logger.ExecuteAction(relativeFile.RelativePath, relativeFile.ActionE);
                 } else {
                     string srcFileContent = this.Src.ReadFile(relativeFile.RelativePath);
                     string dstFileContent = this.Dst.ReadFile(relativeFile.RelativePath);
@@ -108,7 +111,7 @@ public class ContentMapping {
                         // no change
                     } else {
                         this.Dst.WriteFile(relativeFile.RelativePath, srcFileContent);
-                        System.Console.Out.WriteLine($"copy:   {relativeFile.RelativePath}");
+                        this._Logger.ExecuteAction(relativeFile.RelativePath, relativeFile.ActionE);
                     }
                 }
                 continue;
@@ -116,13 +119,14 @@ public class ContentMapping {
 
             if (relativeFile.ActionE == CopyFileSettingsAction.Delete) {
                 if (this.Dst.DeleteFile(relativeFile.RelativePath)) {
-                    System.Console.Out.WriteLine($"delete:   {relativeFile.RelativePath}");
+                    this._Logger.ExecuteAction(relativeFile.RelativePath, relativeFile.ActionE);
                 }
                 continue;
             }
 
             if (relativeFile.ActionE == CopyFileSettingsAction.Diff) {
                 // patch - apply diff
+                // this._Logger.ExecuteAction(relativeFile.RelativePath, relativeFile.ActionE);
                 continue;
             }
         }
@@ -136,7 +140,7 @@ public class ContentMapping {
                 if (this.CompareFileContent(srcFileContent, dstFileContent)) {
                     // no change
                 } else {
-                    System.Console.Out.WriteLine($"diff: {relativeFile.RelativePath}");
+                    this._Logger.DiffAction(relativeFile.RelativePath);
                 }
             }
         }
@@ -156,14 +160,13 @@ public class ContentMapping {
         foreach (var file in listFiles) {
             if (file.RelativePath is { Length: > 0 } relativePath) {
                 listCopyFileSettings.Add(new CopyFileSettings {
-                    Path = relativePath,
+                    Path = AppConfigurationUtility.ConvertPathForSettings(relativePath),
                     ActionE = file.ActionE
                 });
             }
         }
         appConfigurationService.SaveCopyFileSettings(settingsNameJson, listCopyFileSettings);
     }
-
 
     public bool CompareFileContent(string srcFileContent, string dstFileContent) {
         if (string.Equals(srcFileContent, dstFileContent, StringComparison.Ordinal)) {

@@ -5,8 +5,8 @@ public sealed class ExcludeSettings {
     private readonly HashSet<string> _GlobalSettings = new(StringComparer.OrdinalIgnoreCase);
     private readonly HashSet<string> _RepoSettings = new(StringComparer.OrdinalIgnoreCase);
     public ExcludeSettings(
-        List<string>? globalSettings,
-        List<string>? repoSettings) {
+        IEnumerable<string>? globalSettings,
+        IEnumerable<string>? repoSettings) {
         if (globalSettings is { } gs) {
             foreach (var name in gs) {
                 if (!string.IsNullOrEmpty(name)) {

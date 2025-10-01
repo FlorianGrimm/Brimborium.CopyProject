@@ -12,13 +12,15 @@ public class AppConfigurationServiceTests {
         var acs1 = new AppConfigurationService(
             Options.Create<AppConfiguration>(new AppConfiguration() {
                 RootFolder = sampleFolder
-            }));
+            }),
+            new DummyLogger<AppConfigurationService>());
 
         var acs2 = new AppConfigurationService(
             Options.Create<AppConfiguration>(new AppConfiguration() {
                 RootFolder = "./sample",
                 RootMarkerFile = "sample/notbuild/marker.txt"
-            }));
+            }),
+            new DummyLogger<AppConfigurationService>());
         await Assert.That(acs1.GetRootFolder()).IsEqualTo(sampleFolder);
         await Assert.That(acs2.GetRootFolder()).IsEqualTo(sampleFolder);
     }
@@ -31,13 +33,15 @@ public class AppConfigurationServiceTests {
             Options.Create<AppConfiguration>(new AppConfiguration() {
                 RootFolder = sampleFolder,
                 SettingsFolder = "settings"
-            }));
+            }),
+            new DummyLogger<AppConfigurationService>());
         var acs2 = new AppConfigurationService(
             Options.Create<AppConfiguration>(new AppConfiguration() {
                 RootFolder = "./sample",
                 RootMarkerFile = "sample/notbuild/marker.txt",
                 SettingsFolder = "settings"
-            }));
+            }),
+            new DummyLogger<AppConfigurationService>());
         await Assert.That(acs1.GetSettingsFolder()).IsEqualTo(sampleSettingsFolder);
         await Assert.That(acs2.GetSettingsFolder()).IsEqualTo(sampleSettingsFolder);
     }
@@ -51,14 +55,16 @@ public class AppConfigurationServiceTests {
                 RootFolder = sampleFolder,
                 SettingsFolder = "settings",
                 SettingsFile = "settings.json"
-            }));
+            }),
+            new DummyLogger<AppConfigurationService>());
         var acs2 = new AppConfigurationService(
             Options.Create<AppConfiguration>(new AppConfiguration() {
                 RootFolder = "./sample",
                 RootMarkerFile = "sample/notbuild/marker.txt",
                 SettingsFolder = "settings",
                 SettingsFile = "settings.json"
-            }));
+            }),
+            new DummyLogger<AppConfigurationService>());
         await Assert.That(acs1.GetSettingsFile()).IsEqualTo(sampleSettingsFile);
         await Assert.That(acs2.GetSettingsFile()).IsEqualTo(sampleSettingsFile);
     }
@@ -75,7 +81,8 @@ public class AppConfigurationServiceTests {
                 RootFolder = sampleFolder,
                 SettingsFolder = "settings",
                 SettingsFile = "settings.json"
-            }));
+            }),
+            new DummyLogger<AppConfigurationService>());
         CopyProjectSettings copyProjectSettings =
             new() {
                 ExcludeFolderNames = ["bin", "obj", "node_modules"],

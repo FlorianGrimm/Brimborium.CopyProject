@@ -1,0 +1,14 @@
+[
+  {
+    "Path": "a1.txt",
+    "Action": "copy"
+  },
+  {
+    "Path": "a2.txt",
+    "Action": "copy"
+  },
+  {
+    "Path": "a3/a4.txt",
+    "Action": "copy"
+  }
+]

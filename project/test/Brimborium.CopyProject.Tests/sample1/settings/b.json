@@ -1,0 +1,10 @@
+[
+  {
+    "Path": "b1.txt",
+    "Action": "copy"
+  },
+  {
+    "Path": "b2/b3.txt",
+    "Action": "delete"
+  }
+]

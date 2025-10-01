@@ -1,13 +1,16 @@
 {
   "ExcludeFolderNames": [
     "bin",
-    "obj"
+    "obj",
+    "node_modules"
   ],
   "Projects": [
     {
-      "SourcePath": "src",
-      "TargetPath": "dst",
-      "DiffPath": null
+      "SettingsName": null,
+      "SourcePath": "settings/project1src",
+      "TargetPath": "settings/project1dst",
+      "DiffPath": null,
+      "ExcludeFolderNames": []
     }
   ]
 }

@@ -13,4 +13,5 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Brimborium.CopyProject\Brimborium.CopyProject.csproj" />
   </ItemGroup>
+  <ProjectExtensions><VisualStudio><UserProperties sample1_4settings_4copy_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
 </Project>

@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Brimborium.CopyProject;
 
 public static partial class AppConfigurationUtility {
@@ -55,9 +57,21 @@ public static partial class AppConfigurationUtility {
             var relativePath = System.IO.Path.GetRelativePath(fullRootFolder, fullPath);
             return (relativePath, true);
         } else {
-            return (path, true);
+            return (path, false);
         }
     }
+
+    [return: NotNullIfNotNullAttribute("path")]
+    public static string? ConvertPathForSettings(string? path)
+        => (path is null) ? path : path.Replace('\\', '/');
+
+    [return: NotNullIfNotNullAttribute("path")]
+    public static string? ConvertPathToUse(string? path) 
+        => path switch {
+        not null when Path.DirectorySeparatorChar == '\\' => path.Replace('/', '\\'),
+        _ => path
+    };
+
 
     public static string EnsureJsonExtension(string settingsName) {
         var extension = System.IO.Path.GetExtension(settingsName);

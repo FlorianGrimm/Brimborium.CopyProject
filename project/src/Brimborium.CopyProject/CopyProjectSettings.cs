@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Logging;
+
 namespace Brimborium.CopyProject;
 
 public sealed class CopyProjectSettings {
@@ -7,24 +9,18 @@ public sealed class CopyProjectSettings {
 
 public static class CopyProjectSettingsExtension {
     public static ExcludeSettings GetExcludeSettings(this CopyProjectSettings that)
-        => new ExcludeSettings(that.ExcludeFolderNames, null);
+        => new ExcludeSettings(
+            new string[] { ".git", ".github", ".vscode", "bin", "obj", "artifacts", "node_modules" },
+            that.ExcludeFolderNames);
 
     public static bool Normalize(
         this CopyProjectSettings that,
-        AppConfigurationService appConfigurationService,
-        ExcludeSettings excludeSettings) {
+        AppConfigurationService appConfigurationService) {
         bool result = false;
         var rootFolder = appConfigurationService.GetRootFolder();
         for (int idxProject = 0; idxProject < that.Projects.Count; idxProject++) {
             CopyProjectMap project = that.Projects[idxProject];
-            if (!(project.SettingsName is { Length: > 0 } settingsName)) {
-                throw new InvalidOperationException($"{idxProject} SettungsName is empty.");
-            }
-            if (string.IsNullOrEmpty(project.SourcePath)
-                || string.IsNullOrEmpty(project.TargetPath)) {
-                throw new InvalidOperationException($"{project.SettingsName} - SourcePath and TargetPath must be set.");
-            }
-            if (project.Normalize(rootFolder)) {
+            if (project.Normalize(idxProject, rootFolder)) {
                 result = true;
             }
         }
@@ -34,12 +30,13 @@ public static class CopyProjectSettingsExtension {
     public static List<ContentMapping> LoadProjectsFromFile(
         this CopyProjectSettings that,
         AppConfigurationService appConfigurationService,
-        ExcludeSettings excludeSettings) {
+        ExcludeSettings excludeSettings,
+        ILogger logger) {
         List<ContentMapping> result = [];
         var rootFolder = appConfigurationService.GetRootFolder();
         foreach (var project in that.Projects) {
-            var contentMapping = project.LoadProjectFormFile(appConfigurationService, excludeSettings);
-            if (contentMapping is not null) { 
+            var contentMapping = project.LoadProjectFormFile(appConfigurationService, excludeSettings, logger);
+            if (contentMapping is not null) {
                 result.Add(contentMapping);
             }
         }
